@@ -116,7 +116,9 @@ def collect_csv_structure(
 
             # Сохраняем информацию
             info_dict[record_id] = {
-                field: row.get(field, '') for field in row.keys()
+                field: (row.get(field, '').strip().lower() if field ==
+                        parent_field and row.get(field) else row.get(field, ''))
+                for field in row.keys()
             }
 
             # Строим дерево иерархии

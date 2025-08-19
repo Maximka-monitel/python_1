@@ -46,10 +46,6 @@ class XMLGenerator:
             with xf.element('{%s}RDF' % self.namespaces['rdf'], nsmap=self.namespaces):
                 content_generator(xf)
 
-    def _add_newline(self, xf: xmlfile) -> None:
-        """Добавляет перенос строки."""
-        xf.write('\n')
-
     def add_full_model(
         self,
         xf: xmlfile,
@@ -70,11 +66,9 @@ class XMLGenerator:
             # Используем xf.element для правильных префиксов
             with xf.element('{%s}Model.created' % self.namespaces.get('md', '')):
                 xf.write(time_str)
-            self._add_newline(xf)
 
             with xf.element('{%s}Model.version' % self.namespaces.get('md', '')):
                 xf.write(model_version)
-            self._add_newline(xf)
 
             # Добавляем Model.name с пространством имен из config
             me_namespace = get_config_value('xml_generation.me_namespace')
@@ -85,9 +79,7 @@ class XMLGenerator:
                 # fallback если не указано в config
                 with xf.element('{%s}Model.name' % self.namespaces.get('md', '')):
                     xf.write(model_name)
-            self._add_newline(xf)
 
-        self._add_newline(xf)
         return model_uid
 
 
@@ -144,47 +136,38 @@ class AccessXMLGenerator(XMLGenerator):
 
             with xf.element('{%s}IdentifiedObject.name' % self.namespaces['cim']):
                 xf.write(full_name)
-            self._add_newline(xf)
 
             # IdentifiedObject.ParentObject (фиксированное значение)
             parent_attrib = {
                 '{%s}resource' % self.namespaces['rdf']: "#_50000dc6-0000-0000-c000-0000006d746c"}
             with xf.element('{%s}IdentifiedObject.ParentObject' % self.namespaces['cim'], attrib=parent_attrib):
                 pass
-            self._add_newline(xf)
 
             # DataItem.isHostRestricted
             with xf.element('{%s}DataItem.isHostRestricted' % self.namespaces['cim']):
                 xf.write('false')
-            self._add_newline(xf)
 
             # DataItem.isUserRestricted
             with xf.element('{%s}DataItem.isUserRestricted' % self.namespaces['cim']):
                 xf.write('true')
-            self._add_newline(xf)
 
             # DataItem.Category (фиксированное значение)
             category_attrib = {
                 '{%s}resource' % self.namespaces['rdf']: "#_20000db8-0000-0000-c000-0000006d746c"}
             with xf.element('{%s}DataItem.Category' % self.namespaces['cim'], attrib=category_attrib):
                 pass
-            self._add_newline(xf)
 
             # DataGroup.Class (фиксированное значение)
             class_attrib = {
                 '{%s}resource' % self.namespaces['rdf']: "#_50000dc6-0000-0000-c000-0000006d746c"}
             with xf.element('{%s}DataGroup.Class' % self.namespaces['cim'], attrib=class_attrib):
                 pass
-            self._add_newline(xf)
 
             # DataGroup.Objects (связь с ObjectReference)
             objects_attrib = {'{%s}resource' %
                               self.namespaces['rdf']: "#_" + objectref_uid}
             with xf.element('{%s}DataGroup.Objects' % self.namespaces['cim'], attrib=objects_attrib):
                 pass
-            self._add_newline(xf)
-
-        self._add_newline(xf)
 
         # Добавляем ObjectReference
         or_attrib = {'{%s}about' %
@@ -193,16 +176,12 @@ class AccessXMLGenerator(XMLGenerator):
             # ObjectReference.objectUid
             with xf.element('{%s}ObjectReference.objectUid' % self.namespaces['cim']):
                 xf.write(dep_uid)
-            self._add_newline(xf)
 
             # ObjectReference.Group (связь с DataGroup)
             group_attrib = {'{%s}resource' %
                             self.namespaces['rdf']: "#_" + dg_uid}
             with xf.element('{%s}ObjectReference.Group' % self.namespaces['cim'], attrib=group_attrib):
                 pass
-            self._add_newline(xf)
-
-        self._add_newline(xf)
 
         return dg_uid, objectref_uid
 
@@ -257,40 +236,32 @@ class AccessXMLGenerator(XMLGenerator):
 
             with xf.element('{%s}IdentifiedObject.name' % self.namespaces['cim']):
                 xf.write(role_name)
-            self._add_newline(xf)
 
             # IdentifiedObject.ParentObject
             parent_attrib = {'{%s}resource' %
                              self.namespaces['rdf']: "#_" + folder_uid}
             with xf.element('{%s}IdentifiedObject.ParentObject' % self.namespaces['cim'], attrib=parent_attrib):
                 pass
-            self._add_newline(xf)
 
             # Role.isHost
             with xf.element('{%s}Role.isHost' % self.namespaces['cim']):
                 xf.write('false')
-            self._add_newline(xf)
 
             # Role.isUser
             with xf.element('{%s}Role.isUser' % self.namespaces['cim']):
                 xf.write('true')
-            self._add_newline(xf)
 
             # Role.kind
             kind_attrib = {'{%s}resource' %
                            self.namespaces['rdf']: "cim:RoleKind.allow"}
             with xf.element('{%s}Role.kind' % self.namespaces['cim'], attrib=kind_attrib):
                 pass
-            self._add_newline(xf)
 
             # Role.Privileges (связь с Privilege)
             priv_attrib = {'{%s}resource' %
                            self.namespaces['rdf']: "#_" + privilege_uid}
             with xf.element('{%s}Role.Privileges' % self.namespaces['cim'], attrib=priv_attrib):
                 pass
-            self._add_newline(xf)
-
-        self._add_newline(xf)
 
         # Добавляем Privilege
         priv_attrib = {'{%s}about' %
@@ -301,7 +272,6 @@ class AccessXMLGenerator(XMLGenerator):
                                 self.namespaces['rdf']: "#_" + r_uid}
             with xf.element('{%s}Privilege.Role' % self.namespaces['cim'], attrib=role_link_attrib):
                 pass
-            self._add_newline(xf)
 
             # Privilege.DataItems (связи с DataGroups)
             for dg_uid in datagroup_uids:
@@ -309,18 +279,35 @@ class AccessXMLGenerator(XMLGenerator):
                                self.namespaces['rdf']: "#_" + dg_uid}
                 with xf.element('{%s}Privilege.DataItems' % self.namespaces['cim'], attrib=data_attrib):
                     pass
-                self._add_newline(xf)
 
             # Privilege.Operation (фиксированное значение)
             operation_attrib = {
                 '{%s}resource' % self.namespaces['rdf']: "#_2000065d-0000-0000-c000-0000006d746c"}
             with xf.element('{%s}Privilege.Operation' % self.namespaces['cim'], attrib=operation_attrib):
                 pass
-            self._add_newline(xf)
-
-        self._add_newline(xf)
 
         return r_uid, privilege_uid
+
+
+def format_xml_pretty(file_path: str) -> None:
+    """
+    Читает XML и записывает с отступами (pretty print).
+    """
+    # Парсим с сохранением пробелов
+    parser = etree.XMLParser(remove_blank_text=False, encoding='utf-8')
+    tree = etree.parse(file_path, parser)
+    root = tree.getroot()
+
+    # Добавляем отступы
+    etree.indent(root, space="  ")
+
+    # Перезаписываем файл
+    tree.write(
+        file_path,
+        encoding="utf-8",
+        xml_declaration=True,
+        pretty_print=True
+    )
 
 
 # Фабричные функции для обратной совместимости
