@@ -92,9 +92,12 @@ class CSVProcessor:
             # Обрабатываем строки CSV и создаем роли
             for line_num, row in iter_csv_rows(csv_file_path, encoding, self.required_fields, logger):
                 dep_uid = row['dep_uid']
+                dep_uid = dep_uid.lower()
                 org_name = row.get('org_name', '')
                 dep_name = row.get('dep_name', '')
                 dep_headdep_uid = row.get('dep_headdep_uid', None)
+                if dep_headdep_uid:
+                    dep_headdep_uid = dep_headdep_uid.lower()
 
                 # Определяем к каким элементам данных даем доступ
                 data_items_uids = []

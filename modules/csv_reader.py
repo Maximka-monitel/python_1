@@ -107,19 +107,24 @@ def collect_csv_structure(
             if not ok:
                 continue
 
-            # Извлекаем основную информацию
+            # Извлекаем record_id и нормализуем к нижнему регистру
             record_id = row[required_fields[2]] if len(
                 required_fields) > 2 else None
-            if record_id:
-                info_dict[record_id] = {
-                    field: row.get(field, '') for field in row.keys()
-                }
+            if not record_id:
+                continue
+            record_id = record_id.strip().lower()  # ✅ Нормализуем
 
-                # Строим дерево иерархии если указано поле родителя
-                if parent_field and parent_field in row:
-                    parent_id = row[parent_field].strip()
-                    if parent_id:
-                        tree_dict.setdefault(parent_id, set()).add(record_id)
+            # Сохраняем информацию
+            info_dict[record_id] = {
+                field: row.get(field, '') for field in row.keys()
+            }
+
+            # Строим дерево иерархии
+            if parent_field and parent_field in row:
+                parent_id = row[parent_field].strip()
+                if parent_id:
+                    parent_id = parent_id.lower()  # ✅ Нормализуем и родителя
+                    tree_dict.setdefault(parent_id, set()).add(record_id)
 
     return info_dict, tree_dict
 
