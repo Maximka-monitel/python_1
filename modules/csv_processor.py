@@ -12,7 +12,8 @@ from .csv_reader import (
     read_encoding, iter_csv_rows, collect_csv_structure,
     collect_all_children, check_required_fields, gen_uid
 )
-from .xml_generator import create_access_generator
+from .xml_generator import (create_access_generator,
+                            format_xml_pretty)
 from .config_manager import get_config_value
 
 
@@ -92,9 +93,12 @@ class CSVProcessor:
             # Обрабатываем строки CSV и создаем роли
             for line_num, row in iter_csv_rows(csv_file_path, encoding, self.required_fields, logger):
                 dep_uid = row['dep_uid']
+                dep_uid = dep_uid.lower()
                 org_name = row.get('org_name', '')
                 dep_name = row.get('dep_name', '')
                 dep_headdep_uid = row.get('dep_headdep_uid', None)
+                if dep_headdep_uid:
+                    dep_headdep_uid = dep_headdep_uid.lower()
 
                 # Определяем к каким элементам данных даем доступ
                 data_items_uids = []
@@ -143,6 +147,7 @@ class CSVProcessor:
 
         try:
             xml_generator.generate_xml(xml_file_path, generate_content)
+            format_xml_pretty(xml_file_path)
             logger.info(f"Завершена обработка файла. Всего добавлено ролей: {roles_added}. "
                         f"XML сохранён: {xml_file_path}")
             return True
